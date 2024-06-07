@@ -1,0 +1,56 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
+    "version": "1.1.0",
+    "manifestVersion": "1.15",
+    "id": "c2484053-71e1-4783-b231-d3ebb92430ee",
+    "packageName": "com.package.name",
+    "name": {
+        "short": "Polichat",
+        "full": "Polichat "
+    },
+    "developer": {
+        "name": "Pakistan Single Window",
+        "mpnId": "",
+        "websiteUrl": "https://www.psw.gov.pk/",
+        "privacyUrl": "https://www.psw.gov.pk/privacy-policy/8",
+        "termsOfUseUrl": "https://www.psw.gov.pk/privacy-policy/8"
+    },
+    "description": {
+        "short": "HR Query and Policy Bot",
+        "full": "Chatbot for querying HR directly about Updates and Policies"
+    },
+    "icons": {
+        "outline": "outline.png",
+        "color": "messages.png"
+    },
+    "accentColor": "#FFFFFF",
+    "staticTabs": [
+        {
+            "entityId": "conversations",
+            "scopes": [
+                "personal"
+            ]
+        },
+        {
+            "entityId": "about",
+            "scopes": [
+                "personal"
+            ]
+        }
+    ],
+    "bots": [
+        {
+            "botId": "f3c977e5-abc4-43c0-9021-2b1b5f4d18a2",
+            "scopes": [
+                "personal",
+                "team",
+                "groupChat"
+            ],
+            "isNotificationOnly": false,
+            "supportsCalling": false,
+            "supportsVideo": false,
+            "supportsFiles": false
+        }
+    ],
+    "validDomains": []
+}
