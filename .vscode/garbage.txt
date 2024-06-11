@@ -1,0 +1,253 @@
+
+app.message('Menu', async (context: TurnContext, state: ApplicationTurnState) => {
+    try {
+        console.log('Menu message received.');
+        await sendInitialOptions(context);
+        console.log('Initial options sent successfully.');
+    } catch (error) {
+        console.error('Error handling Menu:', error);
+        await context.sendActivity('An error occurred while handling your request.');
+    }
+});
+
+
+
+
+
+
+async function sendInitialOptions(context: TurnContext) {
+    const buttons = [
+        { type: 'imBack', title: 'Leave Policy', value: 'Leave Policy' },
+        { type: 'imBack', title: 'WFH Policy', value: 'WFH Policy' },
+        { type: 'imBack', title: 'Healthcare Benefit Policy', value: 'Healthcare Benefit' },
+        { type: 'imBack', title: 'Fuel Benefit Policy', value: 'Fuel Benefit Policy' },
+        { type: 'imBack', title: 'Contact Us', value: 'Contact Us' }
+    ];
+
+    const card = CardFactory.heroCard('Welcome! Please choose an option:', [], buttons);
+    const message = MessageFactory.attachment(card);
+    await context.sendActivity(message);
+}
+
+
+
+async function testmsg(stri:string, context: TurnContext) {
+    app.message(stri, async (context: TurnContext, state: ApplicationTurnState) => {
+        await context.sendActivity('You selected ' + stri + '! Here is the information you need...');
+    });
+    
+}
+
+async function sendSubOptions(context: TurnContext, option: string, subOptions: string[]) {
+    const buttons = subOptions.map(subOption => ({ type: 'imBack', title: subOption, value: subOption }));
+    const card = CardFactory.heroCard(`${option} - Choose an option:`, [], buttons);
+    const message = MessageFactory.attachment(card);
+    await context.sendActivity(message);
+}
+
+// app.conversationUpdate('membersAdded', async (context: TurnContext, state: ApplicationTurnState) => {
+//     if (context.activity.membersAdded) {
+//         for (const member of context.activity.membersAdded) {
+//             if (member.id !== context.activity.recipient.id) {
+//                 // The bot itself has been added to the conversation
+//                 await sendInitialOptions(context);
+//             }
+//         }
+//     }
+// });
+
+
+
+app.message('Leave Policy', async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendSubOptions(context, 'Leave Policy', ['Leave Policy-1', 'Leave Policy.2', 'Leave Policy.3', 'Leave Policy.4', 'Leave Policy.5']);
+}); 
+app.message('WFH Policy', async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendSubOptions(context, 'WFH Policy', ['WFH Policy.1', 'WFH Policy.2', 'WFH Policy.3', 'WFH Policy.4', 'WFH Policy.5']);
+});
+app.message('Healthcare Benefit', async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendSubOptions(context, 'Healthcare Benefit Policy', ['Healthcare Benefit Policy.1', 'Healthcare Benefit Policy.2', 'Healthcare Benefit Policy.3', 'Healthcare Benefit Policy.4', 'Healthcare Benefit Policy.5']);
+});
+app.message('Fuel Benefit Policy', async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendSubOptions(context, 'Fuel Benefit Policy', ['Fuel Benefit Policy.1', 'Fuel Benefit Policy.2', 'Fuel Benefit Policy.3', 'Fuel Benefit Policy.4', 'FFuel Benefit Policy.5']);
+});
+app.message('Contact Us', async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendSubOptions(context, 'Contact Us', ['Contact Us.1', 'Contact Us.2', 'Contact Us.3', 'Contact Us.4', 'Contact Us.5']);
+});
+
+//Leave Policy sub options Leave Policy.1
+app.message('Leave Policy-1', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Leave Policy.1. Here is the information you need...');
+});
+
+app.message('Leave Policy.2', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Leave Policy.2. Here is the information you need...');
+});
+app.message('Leave Policy.3', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Leave Policy.3. Here is the information you need...');
+});
+app.message('Leave Policy.4', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Leave Policy.4. Here is the information you need...');
+});
+
+app.message('Leave Policy.5', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Leave Policy.5. Here is the information you need...');
+});
+
+//WFH Policy sub options 
+app.message('WFH Policy.1', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected WFH Policy.1. Here is the information you need...');
+});
+
+app.message('WFH Policy.2', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected WFH Policy.2. Here is the information you need...');
+});
+app.message('WFH Policy.3', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected WFH Policy.3. Here is the information you need...');
+});
+app.message('WFH Policy.4', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected WFH Policy.4. Here is the information you need...');
+});
+
+app.message('WFH Policy.5', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected WFH Policy.5. Here is the information you need...');
+});
+
+//Healthcare Benefit Benefit Policy sub options
+
+app.message('Healthcare Benefit.1', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Healthcare Benefit Benefit Policy.1. Here is the information you need...');
+});
+
+app.message('Healthcare Benefit.2', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Healthcare Benefit Benefit Policy.2. Here is the information you need...');
+});
+app.message('Healthcare Benefit.3', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Healthcare Benefit Benefit Policy.3. Here is the information you need...');
+});
+app.message('Healthcare Benefit.4', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Healthcare Benefit Benefit Policy.4. Here is the information you need...');
+});
+
+app.message('Healthcare Benefit.5', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Healthcare Benefit Benefit Policy.5. Here is the information you need...');
+});
+
+// option 4 
+app.message('Fuel Benefit Policy.1', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Fuel Benefit Policy Benefit Policy.1. Here isFuel Benefit Policyformation you need...');
+});
+
+app.message('Fuel Benefit Policy.2', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Fuel Benefit Policy Benefit Policy.2. Here isFuel Benefit Policyformation you need...');
+});
+app.message('Fuel Benefit Policy.3', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Fuel Benefit Policy Benefit Policy.3. Here isFuel Benefit Policyformation you need...');
+});
+app.message('Fuel Benefit Policy.4', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Fuel Benefit Policy Benefit Policy.4. Here isFuel Benefit Policyformation you need...');
+});
+
+app.message('Fuel Benefit Policy.5', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected Fuel Benefit Policy Benefit Policy.5. Here isFuel Benefit Policyformation you need...');
+});
+
+
+//option 5 sub option
+
+app.message('Contact Us.1', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected option 5.1. Here is the information you need...');
+});
+
+app.message('Contact Us.2', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected option 5.2. Here is the information you need...');
+});
+app.message('Contact Us.3', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected option 5.3. Here is the information you need...');
+});
+app.message('Contact Us.4', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected option 5.4. Here is the information you need...');
+});
+
+app.message('Contact Us.5', async (context: TurnContext, state: ApplicationTurnState) => {
+    await context.sendActivity('You selected option 5.5. Here is the information you need...');
+});
+
+
+
+// Handle members being added to the conversation
+// Listen for conversationUpdate events
+// Handle conversation update events
+// Handle conversation update events
+// app.conversationUpdate('membersAdded', async (context: TurnContext, state: ApplicationTurnState) => {
+//     if (context.activity.membersAdded) {
+//         for (const member of context.activity.membersAdded) {
+//             if (member.id === context.activity.recipient.id) {
+//                 // The bot itself has been added to the conversation
+//                 // Send a welcome message with a hero card
+//                 const welcomeMessage = 'Welcome! Here are some options:';
+//                 const card = CardFactory.heroCard(
+//                     'Options:',
+//                     [], // Empty array for images
+//                     [
+//                         { type: 'imBack', title: 'Leave Policy', value: 'Leave Policy' },
+//                         { type: 'imBack', title: 'WFH Policy', value: 'WFH Policy' },
+//                         { type: 'imBack', title: 'Healthcare Benefit Benefit Policy', value: 'Healthcare Benefit Benefit Policy' }
+//                     ]
+//                 );
+//                 const message = MessageFactory.attachment(card);
+//                 await context.sendActivity(welcomeMessage);
+//                 await context.sendActivity(message);
+//                 break; // Exit loop after handling bot's addition to avoid sending duplicate messages
+//             }
+//         }
+//     }
+// });
+
+
+
+
+
+// adapter.use(async (context, next) => {
+//     if (context.activity.type === 'message' && context.activity.value && context.activity.value.action === 'faq') {
+//         const question = context.activity.value.question;
+//         await context.sendActivity(`You selected: ${question}`);
+//         await context.sendActivity(`You selected: ${question}`);
+
+//     }
+//     await next();
+// });
+// Listen for incoming server requests.
+// const sendMessageWithButtons = async (context: TurnContext, message: string, buttons: { text: string, value: string }[]) => {
+//     const buttonList = buttons.map(button => `[${button.text}](${button.value})`).join(', ');
+//     const fullMessage = `${message}\n\n${buttonList}`;
+
+//     await context.sendActivity(fullMessage);
+// };
+
+
+// app.message('showButtons', async (context: TurnContext, state: ApplicationTurnState) => {
+//     const message = 'Here are some buttons:';
+//     const buttons = [
+//         { text: 'Button 1', value: 'https://example.com/button1' },
+//         { text: 'Button 2', value: 'https://example.com/button2' },
+//         // Add more buttons as needed
+//     ];
+
+//     await sendMessageWithButtons(context, message, buttons);
+// });  
+
+async function sendProactiveButtonMessage(context: TurnContext) {
+    const card = CardFactory.heroCard(
+        'Click the button below:',
+        [],
+        [
+            { type: 'imBack', title: 'Send Dummy Message', value: 'dummy message' }
+        ]
+    );
+    const message = MessageFactory.attachment(card);
+    await context.sendActivity(message);
+}
+
+app.message('show button', async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendProactiveButtonMessage(context);
+});
