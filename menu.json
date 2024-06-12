@@ -1,0 +1,45 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "FAQ Menu",
+            "weight": "Bolder",
+            "size": "Medium"
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.Execute",
+        "title": "Intern",
+        "data": { "value": "intern" }
+      },
+      {
+        "type": "Action.Execute",
+        "title": "WFH",
+        "data": { "value": "wfh" }
+      },
+      {
+        "type": "Action.Execute",
+        "title": "Fuel",
+        "data": { "value": "fuel" }
+      },
+      {
+        "type": "Action.Execute",
+        "title": "Contact us",
+        "data": { "value": "contact" }
+      },
+      {
+        "type": "Action.Execute",
+        "title": "Healthcare Benefits",
+        "data": { "value": "healthcare" }
+      }
+    ]
+  }
+  

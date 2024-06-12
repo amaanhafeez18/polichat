@@ -1,7 +1,7 @@
 import { config } from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
-import { CardAction, MessageFactory, TeamsActivityHandler, ActionTypes, CardFactory } from 'botbuilder';
+import { CardAction, MessageFactory, TeamsActivityHandler, ActionTypes, CardFactory, AdaptiveCardInvokeValue, AdaptiveCardInvokeResponse, StatusCodes } from 'botbuilder';
 import * as fs from 'fs';
 import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
 
@@ -13,6 +13,7 @@ import {
     PromptManager,
     TurnState,
     TeamsAdapter,
+    AdaptiveCards,
 } from '@microsoft/teams-ai';
 
 import { addResponseFormatter } from './responseFormatter';
@@ -55,6 +56,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 interface ConversationState {
+    messageId: string;
     count: number;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
@@ -108,38 +110,33 @@ const loadAdaptiveCard = (filePath: string) => {
     return JSON.parse(rawData);
 };
 
-async function sendSuggestedActions(context: TurnContext): Promise<void> {
-    const cardActions: CardAction[] = [
-        {
-            type: ActionTypes.ImBack,
-            title: 'Red',
-            value: 'Red',
-            imageAltText: 'R'
-        },
-        {
-            type: ActionTypes.ImBack,
-            title: 'Yellow',
-            value: 'Yellow',
-            imageAltText: 'Y'
-        },
-        {
-            type: ActionTypes.ImBack,
-            title: 'Blue',
-            value: 'Blue',
-            imageAltText: 'B'
-        }
-    ];
 
-    const reply = MessageFactory.suggestedActions(cardActions, 'What is the best color?');
-    await context.sendActivity(reply);
+async function sendMenuCard(context: TurnContext) {
+    const card = loadAdaptiveCard("menu.json");
+    const cardAttachment = CardFactory.adaptiveCard(card);
+    const message = MessageFactory.attachment(cardAttachment);
+    const sentMessage = await context.sendActivity(message);
+
 }
 
-const sendReturnButton = async (context: TurnContext) => {
+
+async function sendReturnButton(context:TurnContext) {
     const card = loadAdaptiveCard("returnButtonCard.json");
+    const cardAttachment = CardFactory.adaptiveCard(card);
+    const message = MessageFactory.attachment(cardAttachment);
+    const sentMessage = await context.sendActivity(message);
+
+    
+} 
+
+
+const sendAdaptiveCard = async (context: TurnContext, cardFilePath: string) => {
+    const card = loadAdaptiveCard(cardFilePath);
     const cardAttachment = CardFactory.adaptiveCard(card);
     const message = MessageFactory.attachment(cardAttachment);
     await context.sendActivity(message);
 };
+
 
 app.ai.action(
     AI.FlaggedInputActionName,
@@ -169,6 +166,61 @@ app.message(/^(menu|faq|help|show options|display options|main menu|list options
     const message = MessageFactory.attachment(card);
     await context.sendActivity(message);
 });
+
+app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: ApplicationTurnState) => {
+    if (context.activity.type === ActivityTypes.Invoke && context.activity.value) {
+        const invokeValue = context.activity.value as AdaptiveCardInvokeValue;
+
+        if (invokeValue.action && invokeValue.action.type === 'Action.Execute') {
+            const data = invokeValue.action.data;
+            let cardFilePath: string;
+
+            switch (data.value) {
+                case 'intern':
+                    cardFilePath = 'internCard.json';
+                    break;
+                case 'intern_eligibility':
+                    cardFilePath = 'internEligibilityCard.json';
+                    break;
+                case 'intern_stipend':
+                    cardFilePath = 'internStipendCard.json';
+                    break;
+                case 'intern_duration':
+                    cardFilePath = 'internDurationCard.json';
+                    break;
+                case 'wfh':
+                    cardFilePath = 'wfhCard.json';
+                    break;
+                case 'fuel':
+                    cardFilePath = 'fuelCard.json';
+                    break;
+                case 'contact':
+                    cardFilePath = 'contactCard.json';
+                    break;
+                case 'healthcare':
+                    cardFilePath = 'healthcareCard.json';
+                    break;
+                case 'faqMenu':
+                    cardFilePath = 'menu.json';
+                    break;
+                default:
+                    await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown option selected.' });
+                    return;
+            }
+
+            await sendAdaptiveCard(context, cardFilePath);
+            return;
+        } else {
+            await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown or unsupported invoke action.' });
+        }
+    } else {
+        await context.sendActivity({ type: ActivityTypes.Message, text: 'Please select an option from the menu.' });
+    }
+});
+
+
+
+
 
 app.message(/^(intern|wfh|fuel|contact|healthcare)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     const option = context.activity.text.toLowerCase();
@@ -200,7 +252,9 @@ app.message(/^(intern|wfh|fuel|contact|healthcare)$/, async (context: TurnContex
 
     const message = MessageFactory.attachment(card);
     await context.sendActivity(message);
-    await sendReturnButton(context);
+    const messageId = await sendReturnButton(context);
+
+
 });
 
 app.message(/^intern_policy_\d+$/, async (context: TurnContext, state: ApplicationTurnState) => {
@@ -217,17 +271,20 @@ app.message(/^intern_policy_\d+$/, async (context: TurnContext, state: Applicati
             break;
     }
     await context.sendActivity(policyDetails);
-    await sendReturnButton(context);
+
+
 });
+
 
 app.message(/^(reset|exit)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     state.deleteConversationState;
     await context.sendActivity('Resetting conversation, let\'s start over');
-    await sendSuggestedActions(context);
+    await sendMenuCard(context);
 });
 
 app.message('test', async (context: TurnContext, state: ApplicationTurnState) => {
-    await sendSuggestedActions(context);
+await sendMenuCard(context);
+
 });
 
 app.activity(ActivityTypes.EndOfConversation, async (context: TurnContext, state: ApplicationTurnState) => {
@@ -235,6 +292,9 @@ app.activity(ActivityTypes.EndOfConversation, async (context: TurnContext, state
     state.conversation.count = ++count;
     await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
 });
+
+
+
 
 server.post('/api/messages', async (req, res) => {
     await adapter.process(req, res as any, async (context) => {
