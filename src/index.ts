@@ -178,7 +178,6 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
                 case 'fuel':
                     cardFilePath = 'fuelCard.json';
                     break;
-                case ''
                 case 'contact':
                     cardFilePath = 'contactCard.json';
                     break;
