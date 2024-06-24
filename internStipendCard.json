@@ -6,11 +6,15 @@
             "type": "TextBlock",
             "text": "Intern Stipend",
             "weight": "Bolder",
-            "size": "Medium"
+            "size": "Medium",
+            "wrap": true
+
+        
+        
         },
         {
             "type": "TextBlock",
-            "text": "Details about the eligibility criteria..."
+            "text": "The stipend for paid interns at PSW is a fixed amount of Rs. 25,000 per month."
         }
     ],
     "actions": [

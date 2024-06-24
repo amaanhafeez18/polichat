@@ -6,11 +6,13 @@
             "type": "TextBlock",
             "text": "Intern Duration",
             "weight": "Bolder",
-            "size": "Medium"
+            "size": "Medium",
+            "wrap": true
+
         },
         {
             "type": "TextBlock",
-            "text": "Details about the eligibility criteria..."
+            "text": "Interns at PSW are preferably graduates or professional certificate holders, but undergraduates may also be considered for short-term internships. "
         }
     ],
     "actions": [

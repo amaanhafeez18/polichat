@@ -6,11 +6,13 @@
             "type": "TextBlock",
             "text": "Intern Duration",
             "weight": "Bolder",
-            "size": "Medium"
+            "size": "Medium",
+            "wrap": true
+
         },
         {
             "type": "TextBlock",
-            "text": "Details about the eligibility criteria..."
+            "text": "The internship period ranges from 30 days to 6 months and can be paid or unpaid based on various factors."
         }
     ],
     "actions": [

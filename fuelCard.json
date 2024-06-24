@@ -1,0 +1,34 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "The fuel allowance for different employees is: ",
+            "weight": "Bolder",
+            "size": "Medium",
+            "wrap": "true"
+          }
+        ]
+      }
+    ],
+    "actions": [
+
+
+
+      {
+        "type": "Action.Execute",
+        "title": "Contact us",
+        "data": { "value": "contact" }
+      },
+      {
+        "type": "Action.Execute",
+        "title": "Back to Menu",
+        "data": { "value": "faqMenu" }
+    }
+    ]
+  }
+  

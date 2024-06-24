@@ -1,23 +1,12 @@
 import { config } from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
-import { CardAction, MessageFactory, TeamsActivityHandler, ActionTypes, CardFactory, AdaptiveCardInvokeValue, AdaptiveCardInvokeResponse, StatusCodes } from 'botbuilder';
+import {  MessageFactory, CardFactory, AdaptiveCardInvokeValue, AdaptiveCardInvokeResponse, InvokeResponse, ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext  } from 'botbuilder';
 import * as fs from 'fs';
-import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
-
-import {
-    AI,
-    Application,
-    ActionPlanner,
-    OpenAIModel,
-    PromptManager,
-    TurnState,
-    TeamsAdapter,
-    AdaptiveCards,
-} from '@microsoft/teams-ai';
-
+import {AI,Application,ActionPlanner,OpenAIModel,PromptManager,TurnState,TeamsAdapter,AdaptiveCards,} from '@microsoft/teams-ai';
 import { addResponseFormatter } from './responseFormatter';
 import { VectraDataSource } from './VectraDataSource';
+import { PineconeDataSource } from './PineconeDataSource'; 
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
@@ -93,13 +82,23 @@ const app = new Application<ApplicationTurnState>({
     }
 });
 
+// planner.prompts.addDataSource(
+//     new VectraDataSource({
+//         name: 'teams-ai',
+//         apiKey: process.env.OPENAI_KEY!,
+//         azureApiKey: process.env.AZURE_OPENAI_KEY!,
+//         azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+//         indexFolder: path.join(__dirname, '../index')
+//     })
+// );
+// Use PineconeDataSource instead of VectraDataSource
 planner.prompts.addDataSource(
-    new VectraDataSource({
-        name: 'teams-ai',
-        apiKey: process.env.OPENAI_KEY!,
-        azureApiKey: process.env.AZURE_OPENAI_KEY!,
-        azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-        indexFolder: path.join(__dirname, '../index')
+    new PineconeDataSource({
+        name: 'indextest',
+        apiKey: 'af190d88-9467-4c91-89a8-4124ab5f7e88',
+        environment: '',
+        maxDocuments: 5,
+        maxTokensPerDocument: 600,
     })
 );
 
@@ -151,21 +150,6 @@ app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: Ap
     return AI.StopCommandName;
 });
 
-app.message(/^(menu|faq|help|show options|display options|main menu|list options|options list|faq menu|help menu|options)$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    const card = CardFactory.heroCard(
-        'FAQ Menu',
-        [],
-        [
-            { type: 'imBack', title: 'Intern', value: 'intern' },
-            { type: 'imBack', title: 'WFH', value: 'wfh' },
-            { type: 'imBack', title: 'Fuel', value: 'fuel' },
-            { type: 'imBack', title: 'Contact us', value: 'contact' },
-            { type: 'imBack', title: 'Healthcare Benefits', value: 'healthcare' }
-        ]
-    );
-    const message = MessageFactory.attachment(card);
-    await context.sendActivity(message);
-});
 
 app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: ApplicationTurnState) => {
     if (context.activity.type === ActivityTypes.Invoke && context.activity.value) {
@@ -194,6 +178,7 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
                 case 'fuel':
                     cardFilePath = 'fuelCard.json';
                     break;
+                case ''
                 case 'contact':
                     cardFilePath = 'contactCard.json';
                     break;
@@ -208,8 +193,19 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
                     return;
             }
 
-            await sendAdaptiveCard(context, cardFilePath);
+            const card = await loadAdaptiveCard(cardFilePath);
+            const response: InvokeResponse<AdaptiveCardInvokeResponse> = {
+                status: 200,
+                body: {
+                    statusCode: 200,
+                    type: 'application/vnd.microsoft.card.adaptive',
+                    value: card // This assumes card is a parsed JSON object
+                }
+            };
+
+            await context.sendActivity({ type: ActivityTypes.InvokeResponse, value: response });
             return;
+  
         } else {
             await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown or unsupported invoke action.' });
         }
@@ -222,58 +218,12 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
 
 
 
-app.message(/^(intern|wfh|fuel|contact|healthcare)$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    const option = context.activity.text.toLowerCase();
-    let subOptions: { type: string, title: string, value: string }[] = [];
-    switch (option) {
-        case 'intern':
-            subOptions = [
-                { type: 'imBack', title: 'Intern Policy 1', value: 'intern_policy_1' },
-                { type: 'imBack', title: 'Intern Policy 2', value: 'intern_policy_2' }
-            ];
-            break;
-        case 'wfh':
-            break;
-        case 'fuel':
-            break;
-        case 'contact':
-            break;
-        case 'healthcare':
-            break;
-        default:
-            break;
-    }
-
-    const card = CardFactory.heroCard(
-        `${option.toUpperCase()} FAQ`,
-        [],
-        subOptions
-    );
-
-    const message = MessageFactory.attachment(card);
-    await context.sendActivity(message);
-    const messageId = await sendReturnButton(context);
+app.message(/^(Hi|hi|hello|hello bot|polichat|good morning|good evening|menu)$/, async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendMenuCard(context);
 
 
 });
 
-app.message(/^intern_policy_\d+$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    const policy = context.activity.text;
-    let policyDetails = '';
-    switch (policy) {
-        case 'intern_policy_1':
-            policyDetails = 'Intern Policy 1 Details...';
-            break;
-        case 'intern_policy_2':
-            policyDetails = 'Intern Policy 2 Details...';
-            break;
-        default:
-            break;
-    }
-    await context.sendActivity(policyDetails);
-
-
-});
 
 
 app.message(/^(reset|exit)$/, async (context: TurnContext, state: ApplicationTurnState) => {
@@ -286,14 +236,12 @@ app.message('test', async (context: TurnContext, state: ApplicationTurnState) =>
 await sendMenuCard(context);
 
 });
-
+app.adaptiveCards
 app.activity(ActivityTypes.EndOfConversation, async (context: TurnContext, state: ApplicationTurnState) => {
     let count = state.conversation.count ?? 0;
     state.conversation.count = ++count;
     await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
 });
-
-
 
 
 server.post('/api/messages', async (req, res) => {
