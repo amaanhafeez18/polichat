@@ -21,11 +21,13 @@
     },
     "dependencies": {
         "@microsoft/teams-ai": "~1.2.1",
-        "@microsoft/teamsfx": "^2.3.2",
         "@microsoft/teams-js": "^2.23.0",
+        "@microsoft/teamsfx": "^2.3.2",
+        "@pinecone-database/pinecone": "^2.2.2",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
-        "openai": "4.28.4",
+        "openai": "^4.28.4",
+        "pinecone": "^0.1.0",
         "replace": "~1.2.0",
         "restify": "~11.1.0",
         "vectra": "^0.7.6"

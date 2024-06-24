@@ -1,0 +1,41 @@
+{
+    "type": "AdaptiveCard",
+    "version": "1.0",
+    "body": [
+      {
+        "type": "Container",
+        "items": [
+          {
+            "type": "TextBlock",
+            "text": "You can contact us during business hours via Teams, email, or phone. If you have a query after hours, feel free to leave a message, and we'll get back to you as soon as possible.",
+            "weight": "Bolder",
+            "size": "Medium",
+            "wrap": true
+          }
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "type": "Action.OpenUrl",
+        "title": "Email HR",
+        "url": "mailto:HR@psw.org.pk"
+      },
+      {
+        "type": "Action.OpenUrl",
+        "title": "Teams Channel",
+        "url": "https://teams.microsoft.com/l/channel/your-channel-id/your-channel-name"
+      },
+      {
+        "type": "Action.OpenUrl",
+        "title": "Click here to make a call: +92-339-21-6767-6",
+        "url": "tel:+923392167676"
+      },
+      {
+        "type": "Action.Execute",
+        "title": "Back to Menu",
+        "data": { "value": "faqMenu" }
+      }
+    ]
+  }
+  

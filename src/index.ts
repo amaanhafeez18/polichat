@@ -1,22 +1,12 @@
 import { config } from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
-import { CardAction, MessageFactory, TeamsActivityHandler, ActionTypes, CardFactory } from 'botbuilder';
+import {  MessageFactory, CardFactory, AdaptiveCardInvokeValue, AdaptiveCardInvokeResponse, InvokeResponse, ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext  } from 'botbuilder';
 import * as fs from 'fs';
-import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext } from 'botbuilder';
-
-import {
-    AI,
-    Application,
-    ActionPlanner,
-    OpenAIModel,
-    PromptManager,
-    TurnState,
-    TeamsAdapter,
-} from '@microsoft/teams-ai';
-
+import {AI,Application,ActionPlanner,OpenAIModel,PromptManager,TurnState,TeamsAdapter,AdaptiveCards,} from '@microsoft/teams-ai';
 import { addResponseFormatter } from './responseFormatter';
 import { VectraDataSource } from './VectraDataSource';
+import { PineconeDataSource } from './PineconeDataSource'; 
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
@@ -55,6 +45,7 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 });
 
 interface ConversationState {
+    messageId: string;
     count: number;
 }
 type ApplicationTurnState = TurnState<ConversationState>;
@@ -91,13 +82,23 @@ const app = new Application<ApplicationTurnState>({
     }
 });
 
+// planner.prompts.addDataSource(
+//     new VectraDataSource({
+//         name: 'teams-ai',
+//         apiKey: process.env.OPENAI_KEY!,
+//         azureApiKey: process.env.AZURE_OPENAI_KEY!,
+//         azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+//         indexFolder: path.join(__dirname, '../index')
+//     })
+// );
+// Use PineconeDataSource instead of VectraDataSource
 planner.prompts.addDataSource(
-    new VectraDataSource({
-        name: 'teams-ai',
-        apiKey: process.env.OPENAI_KEY!,
-        azureApiKey: process.env.AZURE_OPENAI_KEY!,
-        azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-        indexFolder: path.join(__dirname, '../index')
+    new PineconeDataSource({
+        name: 'indextest',
+        apiKey: 'af190d88-9467-4c91-89a8-4124ab5f7e88',
+        environment: '',
+        maxDocuments: 5,
+        maxTokensPerDocument: 600,
     })
 );
 
@@ -108,38 +109,33 @@ const loadAdaptiveCard = (filePath: string) => {
     return JSON.parse(rawData);
 };
 
-async function sendSuggestedActions(context: TurnContext): Promise<void> {
-    const cardActions: CardAction[] = [
-        {
-            type: ActionTypes.ImBack,
-            title: 'Red',
-            value: 'Red',
-            imageAltText: 'R'
-        },
-        {
-            type: ActionTypes.ImBack,
-            title: 'Yellow',
-            value: 'Yellow',
-            imageAltText: 'Y'
-        },
-        {
-            type: ActionTypes.ImBack,
-            title: 'Blue',
-            value: 'Blue',
-            imageAltText: 'B'
-        }
-    ];
 
-    const reply = MessageFactory.suggestedActions(cardActions, 'What is the best color?');
-    await context.sendActivity(reply);
+async function sendMenuCard(context: TurnContext) {
+    const card = loadAdaptiveCard("menu.json");
+    const cardAttachment = CardFactory.adaptiveCard(card);
+    const message = MessageFactory.attachment(cardAttachment);
+    const sentMessage = await context.sendActivity(message);
+
 }
 
-const sendReturnButton = async (context: TurnContext) => {
+
+async function sendReturnButton(context:TurnContext) {
     const card = loadAdaptiveCard("returnButtonCard.json");
+    const cardAttachment = CardFactory.adaptiveCard(card);
+    const message = MessageFactory.attachment(cardAttachment);
+    const sentMessage = await context.sendActivity(message);
+
+    
+} 
+
+
+const sendAdaptiveCard = async (context: TurnContext, cardFilePath: string) => {
+    const card = loadAdaptiveCard(cardFilePath);
     const cardAttachment = CardFactory.adaptiveCard(card);
     const message = MessageFactory.attachment(cardAttachment);
     await context.sendActivity(message);
 };
+
 
 app.ai.action(
     AI.FlaggedInputActionName,
@@ -154,87 +150,98 @@ app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: Ap
     return AI.StopCommandName;
 });
 
-app.message(/^(menu|faq|help|show options|display options|main menu|list options|options list|faq menu|help menu|options)$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    const card = CardFactory.heroCard(
-        'FAQ Menu',
-        [],
-        [
-            { type: 'imBack', title: 'Intern', value: 'intern' },
-            { type: 'imBack', title: 'WFH', value: 'wfh' },
-            { type: 'imBack', title: 'Fuel', value: 'fuel' },
-            { type: 'imBack', title: 'Contact us', value: 'contact' },
-            { type: 'imBack', title: 'Healthcare Benefits', value: 'healthcare' }
-        ]
-    );
-    const message = MessageFactory.attachment(card);
-    await context.sendActivity(message);
-});
 
-app.message(/^(intern|wfh|fuel|contact|healthcare)$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    const option = context.activity.text.toLowerCase();
-    let subOptions: { type: string, title: string, value: string }[] = [];
-    switch (option) {
-        case 'intern':
-            subOptions = [
-                { type: 'imBack', title: 'Intern Policy 1', value: 'intern_policy_1' },
-                { type: 'imBack', title: 'Intern Policy 2', value: 'intern_policy_2' }
-            ];
-            break;
-        case 'wfh':
-            break;
-        case 'fuel':
-            break;
-        case 'contact':
-            break;
-        case 'healthcare':
-            break;
-        default:
-            break;
+app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: ApplicationTurnState) => {
+    if (context.activity.type === ActivityTypes.Invoke && context.activity.value) {
+        const invokeValue = context.activity.value as AdaptiveCardInvokeValue;
+
+        if (invokeValue.action && invokeValue.action.type === 'Action.Execute') {
+            const data = invokeValue.action.data;
+            let cardFilePath: string;
+
+            switch (data.value) {
+                case 'intern':
+                    cardFilePath = 'internCard.json';
+                    break;
+                case 'intern_eligibility':
+                    cardFilePath = 'internEligibilityCard.json';
+                    break;
+                case 'intern_stipend':
+                    cardFilePath = 'internStipendCard.json';
+                    break;
+                case 'intern_duration':
+                    cardFilePath = 'internDurationCard.json';
+                    break;
+                case 'wfh':
+                    cardFilePath = 'wfhCard.json';
+                    break;
+                case 'fuel':
+                    cardFilePath = 'fuelCard.json';
+                    break;
+                case 'contact':
+                    cardFilePath = 'contactCard.json';
+                    break;
+                case 'healthcare':
+                    cardFilePath = 'healthcareCard.json';
+                    break;
+                case 'faqMenu':
+                    cardFilePath = 'menu.json';
+                    break;
+                default:
+                    await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown option selected.' });
+                    return;
+            }
+
+            const card = await loadAdaptiveCard(cardFilePath);
+            const response: InvokeResponse<AdaptiveCardInvokeResponse> = {
+                status: 200,
+                body: {
+                    statusCode: 200,
+                    type: 'application/vnd.microsoft.card.adaptive',
+                    value: card // This assumes card is a parsed JSON object
+                }
+            };
+
+            await context.sendActivity({ type: ActivityTypes.InvokeResponse, value: response });
+            return;
+  
+        } else {
+            await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown or unsupported invoke action.' });
+        }
+    } else {
+        await context.sendActivity({ type: ActivityTypes.Message, text: 'Please select an option from the menu.' });
     }
-
-    const card = CardFactory.heroCard(
-        `${option.toUpperCase()} FAQ`,
-        [],
-        subOptions
-    );
-
-    const message = MessageFactory.attachment(card);
-    await context.sendActivity(message);
-    await sendReturnButton(context);
 });
 
-app.message(/^intern_policy_\d+$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    const policy = context.activity.text;
-    let policyDetails = '';
-    switch (policy) {
-        case 'intern_policy_1':
-            policyDetails = 'Intern Policy 1 Details...';
-            break;
-        case 'intern_policy_2':
-            policyDetails = 'Intern Policy 2 Details...';
-            break;
-        default:
-            break;
-    }
-    await context.sendActivity(policyDetails);
-    await sendReturnButton(context);
+
+
+
+
+app.message(/^(Hi|hi|hello|hello bot|polichat|good morning|good evening|menu)$/, async (context: TurnContext, state: ApplicationTurnState) => {
+    await sendMenuCard(context);
+
+
 });
+
+
 
 app.message(/^(reset|exit)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     state.deleteConversationState;
     await context.sendActivity('Resetting conversation, let\'s start over');
-    await sendSuggestedActions(context);
+    await sendMenuCard(context);
 });
 
 app.message('test', async (context: TurnContext, state: ApplicationTurnState) => {
-    await sendSuggestedActions(context);
-});
+await sendMenuCard(context);
 
+});
+app.adaptiveCards
 app.activity(ActivityTypes.EndOfConversation, async (context: TurnContext, state: ApplicationTurnState) => {
     let count = state.conversation.count ?? 0;
     state.conversation.count = ++count;
     await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
 });
+
 
 server.post('/api/messages', async (req, res) => {
     await adapter.process(req, res as any, async (context) => {
