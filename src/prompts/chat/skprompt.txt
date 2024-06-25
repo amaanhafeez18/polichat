@@ -46,3 +46,5 @@ Also remember, fuel policy means fuel allowance or fuel cards.
 - If the answer is found:
 - If the answer is not found:
   - "I'm sorry, but I don't have information on [query topic]. Please contact HR directly for further assistance."
+
+The current topic you are talking about is {{$topic}}

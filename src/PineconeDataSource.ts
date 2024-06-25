@@ -105,31 +105,28 @@ export class PineconeDataSource implements DataSource {
      * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
      * @returns {Promise<RenderedPromptSection<string>>} A promise that resolves to the rendered data source.
      */
-    public async renderData(
-        context: TurnContext,
-        memory: Memory,
-        tokenizer: Tokenizer,
-        maxTokens: number
+    public async renderData(context: TurnContext,memory: Memory,tokenizer: Tokenizer,maxTokens: number
     ): Promise<RenderedPromptSection<string>> {
         // Query Pinecone index
    const query = memory.getValue('temp.input') as string;
+   const topics = memory.getValue('conversation.topic') as string;
+
 
     // Ensure the query is a string
     if (typeof query !== 'string') {
         throw new Error("Expected 'temp.input' to be a string");
     }
-        
-        console.log("ahhhhhhhhhhhhhhhhhhhhhhhhh")
-        console.log(query);
-        console.log("ahhhhhhhhhhhhhhhhhhhhhhhhh")
 
-        // Embedding query might be required here based on your use case
-        const embedding = await this._getEmbeddingForQuery(query);
+    const finalQuery = topics ? `${topics} - ${query} ` : query;
+    console.log("topic experimental :", topics);
+    console.log("Final Query:", finalQuery);
+
+    const embedding = await this._getEmbeddingForQuery(finalQuery);
 
         const results = await this._index.query({
             vector: embedding,
             //this._options.maxDocuments ?? 5
-            topK: 1,
+            topK: 3,
             includeMetadata: true,
         });
     
@@ -148,34 +145,12 @@ export class PineconeDataSource implements DataSource {
     
         const concatenatedString = chunks.join('');
     
-        console.log(concatenatedString);
-        // Add documents until you run out of tokens
+        // console.log(concatenatedString);
         let length = 0;
-        // let output = '';
-        // let connector = '';
-        // for (const result of results.matches) {
-        //     const document = await this._fetchDocumentById(result.id);
-        //     let doc = `${connector}url: ${document.uri}\n`;
-        //     let docLength = tokenizer.encode(doc).length;
-        //     const remainingTokens = maxTokens - (length + docLength);
-        //     if (remainingTokens <= 0) {
-        //         break;
-        //     }
-
-        //     // Assume document has `text` property containing the content
-        //     const docContent = document.text ?? '';
-        //     const tokens = tokenizer.encode(docContent).slice(0, remainingTokens);
-        //     const text = tokenizer.decode(tokens);
-        //     docLength += tokens.length;
-
-        //     doc += text;
-        //     output += doc;
-        //     length += docLength;
-        //     connector = '\n\n';
-        // }
 
         return { output: concatenatedString, length, tooLong: length > maxTokens };
     }
+
     private async _getEmbeddingForQuery(query: string): Promise<number[]> {
         // Function to get embeddings for the query
         const response = await openai.embeddings.create({
@@ -185,53 +160,4 @@ export class PineconeDataSource implements DataSource {
           return response.data[0].embedding;
         
     }
-
-//  private async _fetchDocumentById(id: string): Promise<any> {
-//     console.log(`Fetching document with ID: ${id}`);
-//     const query = {
-//         id: id,
-//       };
-
-//     const pcc = new Pinecone({ apiKey:'af190d88-9467-4c91-89a8-4124ab5f7e88' });
-
-//     const indexx = pcc.index('indextest');
-
-//     const results = await  indexx.query({topK: 3, id: id});
-//     const result = await  indexx.fetch( [id]);
-
-//     console.log("meowwwwww")
-//     console.log(id);
-
-//     console.log("meowwwwww")
-//     console.log(result);
-
-//     console.log("meowwwwww")
-//     const chunks: string[] = [];
-
-//     if (results.matches.length > 0) {
-//         for (let i = 0; i < 5; i++) {
-//             const checking = results.matches[i].metadata;
-             
-//             if (checking) {
-//               Object.values(checking).forEach(value => {
-//                 chunks.push(value.toString().replace(/\r\n/g, '').replace(/\n/g, '').replace(/\+/g, ''));
-//               });
-//           }}
-          
-//           const concatenatedString = chunks.join('');
-
-
-        
-//       const document = results.matches[0];
-//       console.log(`Document with ID ${id} found in Pinecone.`);
-//       return {
-
-//           text: concatenatedString,
-
-//       };
-//   }  else {
-//       console.error(`Document with ID ${id} not found in Pinecone.`);
-//       throw new Error(`Document with ID ${id} not found in Pinecone.`);
-//     }
-//   }
- }
+}
