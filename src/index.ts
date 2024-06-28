@@ -95,6 +95,16 @@ planner.prompts.addDataSource(
 
 addResponseFormatter(app);
 
+// app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
+//     if (context.activity.membersAdded) {
+//         for (const member of context.activity.membersAdded) {
+//             if (member.id !== context.activity.recipient.id) {
+//                 await sendMenuCard(context);
+//             }
+//         }
+//     }
+// });
+
 const loadAdaptiveCard = (filePath: string) => {
     const rawData = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(rawData);
@@ -136,7 +146,6 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
                 case 'intern':
                     cardFilePath = 'internCard.json';
                     topic = 'intern';
-
                     break;
                 case 'intern_eligibility':
                     cardFilePath = 'internEligibilityCard.json';
