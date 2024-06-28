@@ -7,7 +7,7 @@
         "items": [
           {
             "type": "TextBlock",
-            "text": "WFH details: ",
+            "text": "The health care details are as follows ",
             "weight": "Bolder",
             "size": "Medium",
             "wrap": "true"
