@@ -143,7 +143,7 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
             let topic: string | undefined; // Added to track the topic
             
             switch (data.value) {
-                case 'intern':
+                case 'showmenu':
                     cardFilePath = 'internCard.json';
                     topic = 'intern';
                     break;
@@ -211,6 +211,8 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
         await context.sendActivity({ type: ActivityTypes.Message, text: 'Please select an option from the menu.' });
     }
 });
+
+
 
 app.message(/^(Hi|hi|hello|hello bot|polichat|good morning|good evening|menu)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     await sendMenuCard(context);
