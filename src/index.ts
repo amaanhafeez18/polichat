@@ -143,7 +143,7 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
             let topic: string | undefined; // Added to track the topic
             
             switch (data.value) {
-                case 'showmenu':
+                case 'intern':
                     cardFilePath = 'internCard.json';
                     topic = 'intern';
                     break;
@@ -178,6 +178,9 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
                 case 'faqMenu':
                     cardFilePath = 'menu.json';
                     break;
+                case 'back_to_menu':
+                    await sendMenuCard(context);
+                    return;
                 default:
                     await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown option selected.' });
                     return;

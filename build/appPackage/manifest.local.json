@@ -38,21 +38,6 @@
             ]
         }
     ],
-    "composeExtensions": [
-    {
-        "botId": "<your-bot-id>",
-        "commands": [
-            {
-                "id": "showMenu",
-                "type": "action",
-                "title": "Show Menu",
-                "description": "Show the adaptive card menu",
-                "fetchTask": true
-            }
-        ]
-    }
-]
-,
     "bots": [
         {
             "botId": "3dabbcd0-1264-42f1-8ff0-f031666978b2",
