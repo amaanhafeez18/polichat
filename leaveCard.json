@@ -7,14 +7,14 @@
       "items": [
         {
           "type": "TextBlock",
-          "text": "FAQ's about Fuel Cards",
+          "text": "Leave Policy FAQ's",
           "weight": "Bolder",
           "size": "Medium",
           "wrap": true
         },
         {
           "type": "TextBlock",
-          "text": "PSW is transitioning from cash-based fuel allowances to PSO Fuel Cards to improve expense management and align with market standards.",
+          "weight": "Bolder",
           "wrap": true
         },
         {
@@ -22,87 +22,105 @@
           "actions": [
             {
               "type": "Action.ToggleVisibility",
-              "title": "Who is eligible for Fuel Cards?",
-              "targetElements": ["eligibilityDetails"]
+              "title": "Annual Leave",
+              "targetElements": ["annualLeaveDetails"]
             }
           ]
         },
         {
           "type": "Container",
-          "id": "eligibilityDetails",
+          "id": "annualLeaveDetails",
           "isVisible": false,
           "items": [
             {
               "type": "TextBlock",
-              "text": "Employees in Grades G-1 to G-7 are eligible. Grades G-3 to G-7 receive fuel cards with existing limits, while Grades G-1 & G-2 replace conveyance allowance with a fuel limit of 80 liters per month.",
-              "wrap": true
+              "text": "20 working days per year, prorated and available after probation. Unused annual leaves can be encashed.",
+              "wrap": true,
+              "maxLines": 0
             }
           ]
+        },
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "wrap": true
         },
         {
           "type": "ActionSet",
           "actions": [
             {
               "type": "Action.ToggleVisibility",
-              "title": "How do I apply for a fuel card?",
-              "targetElements": ["applicationProcessDetails"]
+              "title": "Casual Leave",
+              "targetElements": ["casualLeaveDetails"]
             }
           ]
         },
         {
           "type": "Container",
-          "id": "applicationProcessDetails",
+          "id": "casualLeaveDetails",
           "isVisible": false,
           "items": [
             {
               "type": "TextBlock",
-              "text": "To apply for a fuel card, you need to submit a formal application along with required documents to the HR department. The process typically takes 5-7 business days.",
-              "wrap": true
-            }
-          ]
-        },
-
-        {
-          "type": "ActionSet",
-          "actions": [
-            {
-              "type": "Action.ToggleVisibility",
-              "title": "Fuel Limits for each Grade?",
-              "targetElements": ["fuelLimitsDetails"]
+              "text": "10 working days per year, not carried over. Half-day casual leave applicable for partial day absences.",
+              "wrap": true,
+              "maxLines": 0
             }
           ]
         },
         {
-          "type": "Container",
-          "id": "fuelLimitsDetails",
-          "isVisible": false,
-          "items": [
-            {
-              "type": "TextBlock",
-              "text": "Fuel limits vary by grade. Grades G-1 & G-2 have a monthly limit of 80 liters per month, while other grades have existing fuel allowance limits.",
-              "wrap": true
-            }
-          ]
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "wrap": true
         },
         {
           "type": "ActionSet",
           "actions": [
             {
               "type": "Action.ToggleVisibility",
-              "title": "Fuel Card lost / stolen?",
-              "targetElements": ["securityDetails"]
+              "title": "Sick Leave",
+              "targetElements": ["sickLeaveDetails"]
             }
           ]
         },
         {
           "type": "Container",
-          "id": "securityDetails",
+          "id": "sickLeaveDetails",
           "isVisible": false,
           "items": [
             {
               "type": "TextBlock",
-              "text": "If your fuel card is lost or stolen, immediately report it to the HR department to deactivate the card and issue a replacement.",
-              "wrap": true
+              "text": "10 working days per year, prorated. Special sick leave up to 30 days for prolonged illness after 8 months of service.",
+              "wrap": true,
+              "maxLines": 0
+            }
+          ]
+        },
+        {
+          "type": "TextBlock",
+          "weight": "Bolder",
+          "wrap": true
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.ToggleVisibility",
+              "title": "Bereavement Leave",
+              "targetElements": ["bereavementLeaveDetails"]
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "id": "bereavementLeaveDetails",
+          "isVisible": false,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "7 working days for the death of a close family member.",
+              "wrap": true,
+              "maxLines": 0
             }
           ]
         }

@@ -1,34 +1,119 @@
 {
-    "type": "AdaptiveCard",
-    "version": "1.0",
-    "body": [
-      {
-        "type": "Container",
-        "items": [
-          {
-            "type": "TextBlock",
-            "text": "The health care details are as follows ",
-            "weight": "Bolder",
-            "size": "Medium",
-            "wrap": "true"
-          }
-        ]
-      }
-    ],
-    "actions": [
-
-
-
-      {
-        "type": "Action.Execute",
-        "title": "Contact us",
-        "data": { "value": "contact" }
-      },
-      {
-        "type": "Action.Execute",
-        "title": "Back to Menu",
-        "data": { "value": "faqMenu" }
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "FAQ's about Healthcare Benefits",
+          "weight": "Bolder",
+          "size": "Medium",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "PSW is transitioning from salary-based medical allowances to a comprehensive group health insurance plan to enhance coverage and reduce costs.",
+          "wrap": true
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.ToggleVisibility",
+              "title": "Options for the healthcare benefits",
+              "targetElements": ["policyOptionsDetails"],
+              "maxLines":0
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "id": "policyOptionsDetails",
+          "isVisible": false,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "PSWC has considered adjusting medical allowances for domain officers or replacing them with comprehensive group insurance.",
+              "wrap": true
+            }
+          ]
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.ToggleVisibility",
+              "title": "What does the policy cover?",
+              "targetElements": ["coverageDetails"]
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "id": "coverageDetails",
+          "isVisible": false,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "The policy covers outpatient (OPD) and inpatient (IPD) treatments, including consultations, diagnostics, hospitalization, and prescribed medications.",
+              "wrap": true
+            }
+          ]
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.ToggleVisibility",
+              "title":"Cost Impact Implementing Group Insurance",
+              "targetElements": ["financialImpactDetails"]
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "id": "financialImpactDetails",
+          "isVisible": false,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "The annual cost for outpatient (OPD) and inpatient (IPD) services under group insurance is projected to be Rs. 26 million and Rs. 24 million, respectively.",
+              "wrap": true
+            }
+          ]
+        },
+        {
+          "type": "ActionSet",
+          "actions": [
+            {
+              "type": "Action.ToggleVisibility",
+              "title": "How do I file a claim?",
+              "targetElements": ["claimProcessDetails"]
+            }
+          ]
+        },
+        {
+          "type": "Container",
+          "id": "claimProcessDetails",
+          "isVisible": false,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Claims can be filed through the HR department or directly with the insurer via their online portal. Ensure all required documents are submitted for timely processing.",
+              "wrap": true
+            }
+          ]
+        }
+      ]
     }
-    ]
-  }
-  
+  ],
+  "actions": [
+    {
+      "type": "Action.Execute",
+      "title": "Back to Menu",
+      "data": { "value": "faqMenu" }
+    }
+  ]
+}

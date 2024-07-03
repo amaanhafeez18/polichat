@@ -7,7 +7,7 @@
         "items": [
           {
             "type": "TextBlock",
-            "text": "Welcome to Polichat! Click one of the options below or type in your query. At any point, type in my hi or my name to return here! ",
+            "text": "Welcome to Polichat! Click one of the policies below or type in your query. At any point, type in my hi or my name to return here! ",
             "weight": "Bolder",
             "size": "Medium",
             "wrap": "true"
@@ -18,8 +18,8 @@
     "actions": [
       {
         "type": "Action.Execute",
-        "title": "Intern",
-        "data": { "value": "intern" }
+        "title": "Leave",
+        "data": { "value": "leave" }
       },
       {
         "type": "Action.Execute",
@@ -33,14 +33,15 @@
       },
       {
         "type": "Action.Execute",
-        "title": "Contact us",
-        "data": { "value": "contact" }
+        "title": "Healthcare Benefits",
+        "data": { "value": "healthcare" }
       },
       {
         "type": "Action.Execute",
-        "title": "Healthcare Benefits",
-        "data": { "value": "healthcare" }
+        "title": "Contact us",
+        "data": { "value": "contact" }
       }
+
     ]
   }
   
