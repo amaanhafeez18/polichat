@@ -22,7 +22,7 @@
           "actions": [
             {
               "type": "Action.ToggleVisibility",
-              "title": "Options for the healthcare benefits",
+              "title": "Health insurance benefit",
               "targetElements": ["policyOptionsDetails"],
               "maxLines":0
             }
@@ -35,7 +35,7 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "PSWC has considered adjusting medical allowances for domain officers or replacing them with comprehensive group insurance.",
+              "text": " The plan includes OPD coverage of Rs. 100,000 per employee per annum and IPD coverage of Rs. 500,000 to 1,000,000 per employee per annum, including immediate family and parents.",
               "wrap": true
             }
           ]
@@ -67,7 +67,7 @@
           "actions": [
             {
               "type": "Action.ToggleVisibility",
-              "title":"Cost Impact Implementing Group Insurance",
+              "title":"Equity and fairness policy",
               "targetElements": ["financialImpactDetails"]
             }
           ]
@@ -79,7 +79,7 @@
           "items": [
             {
               "type": "TextBlock",
-              "text": "The annual cost for outpatient (OPD) and inpatient (IPD) services under group insurance is projected to be Rs. 26 million and Rs. 24 million, respectively.",
+              "text": "All employees are covered under the same group health insurance plan, which includes OPD and IPD coverage for employees, their immediate family members, and parents.",
               "wrap": true
             }
           ]

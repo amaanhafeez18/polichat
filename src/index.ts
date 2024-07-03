@@ -59,7 +59,7 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 
 const model = new OpenAIModel({
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
+    defaultModel: 'gpt-3.5-turbo-0125',
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
     azureDefaultDeployment: 'gpt-3.5-turbo',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
@@ -99,16 +99,6 @@ planner.prompts.addDataSource(
 
 addResponseFormatter(app);
 
-// app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
-//     if (context.activity.membersAdded) {
-//         for (const member of context.activity.membersAdded) {
-//             if (member.id !== context.activity.recipient.id) {
-//                 await sendMenuCard(context);
-//             }
-//         }
-//     }
-// });
-
 const loadAdaptiveCard = (filePath: string) => {
     const rawData = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(rawData);
@@ -122,6 +112,17 @@ async function sendMenuCard(context: TurnContext) {
     await context.sendActivity(message);
 
 }
+
+app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
+    if (context.activity.membersAdded) {
+        for (const member of context.activity.membersAdded) {
+            if (member.id !== context.activity.recipient.id) {
+                await context.sendActivity('Welcome! How can I assist you today?');
+                await sendMenuCard(context);
+            }
+        }
+    }
+});
 
 app.ai.action(
     AI.FlaggedInputActionName,
@@ -147,7 +148,7 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
             let topic: string | undefined; // Added to track the topic
             
             switch (data.value) {
-                case 'intern':
+                case 'leave':
                     cardFilePath = 'leaveCard.json';
                     topic = 'leave';
                     break;
@@ -207,16 +208,7 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
         await context.sendActivity({ type: ActivityTypes.Message, text: 'Please select an option from the menu.' });
     }
 });
-app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
-    if (context.activity.membersAdded) {
-        for (const member of context.activity.membersAdded) {
-            if (member.id !== context.activity.recipient.id) {
-                await context.sendActivity('Welcome! How can I assist you today?');
-                await sendMenuCard(context);
-            }
-        }
-    }
-});
+
 
 
 

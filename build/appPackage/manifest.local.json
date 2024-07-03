@@ -17,11 +17,11 @@
     },
     "description": {
         "short": "HR Query and Policy Bot",
-        "full": "Chatbot for querying HR directly about Updates and Policies"
+        "full": "Polichat HR Assistant is a chatbot designed to help PSW employees with HR-related queries and tasks. It offers a convenient FAQ menu and a context-aware AI for handling more complex questions, simplifying your HR interactions."
     },
     "icons": {
         "outline": "outline.png",
-        "color": "messages.png"
+        "color": "chatbot.gif"
     },
     "accentColor": "#FFFFFF",
     "staticTabs": [
@@ -33,6 +33,14 @@
         },
         {
             "entityId": "about",
+            "scopes": [
+                "personal"
+            ]
+        },
+        {
+            "entityId": "howToUse",
+            "name": "How to Use",
+            "contentUrl": "https://amaanhafeez18.github.io/howTo.html",
             "scopes": [
                 "personal"
             ]
