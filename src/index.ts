@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import {AI,Application,ActionPlanner,OpenAIModel,PromptManager,TurnState,TeamsAdapter} from '@microsoft/teams-ai';
 import { addResponseFormatter } from './responseFormatter';
 import { PineconeDataSource } from './PineconeDataSource'; 
+import AsyncLock from 'async-lock';
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
@@ -29,7 +30,7 @@ const onTurnErrorHandler = async (context: TurnContext, error: any) => {
         'TurnError'
     );
     await context.sendActivity('The bot encountered an error or bug.');
-    await context.sendActivity('To continue to run this bot, please fix the bot source code.');
+    await context.sendActivity('Please try again or contact HR directly at HR@psw.org');
 };
 
 adapter.onTurnError = onTurnErrorHandler;
@@ -46,6 +47,9 @@ interface ConversationState {
     messageId: string;
     count: number;
     topic: string; // Added to track the current topic
+    lastInteractionTime: number; // Added to store the last interaction time
+    isProcessing: boolean; // Added to track if a message is being processed
+
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
@@ -55,7 +59,7 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 
 const model = new OpenAIModel({
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo',
+    defaultModel: 'gpt-3.5-turbo-0125',
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
     azureDefaultDeployment: 'gpt-3.5-turbo',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
@@ -95,16 +99,6 @@ planner.prompts.addDataSource(
 
 addResponseFormatter(app);
 
-// app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
-//     if (context.activity.membersAdded) {
-//         for (const member of context.activity.membersAdded) {
-//             if (member.id !== context.activity.recipient.id) {
-//                 await sendMenuCard(context);
-//             }
-//         }
-//     }
-// });
-
 const loadAdaptiveCard = (filePath: string) => {
     const rawData = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(rawData);
@@ -118,6 +112,17 @@ async function sendMenuCard(context: TurnContext) {
     await context.sendActivity(message);
 
 }
+
+app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
+    if (context.activity.membersAdded) {
+        for (const member of context.activity.membersAdded) {
+            if (member.id !== context.activity.recipient.id) {
+                await context.sendActivity('Welcome! How can I assist you today?');
+                await sendMenuCard(context);
+            }
+        }
+    }
+});
 
 app.ai.action(
     AI.FlaggedInputActionName,
@@ -143,22 +148,11 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
             let topic: string | undefined; // Added to track the topic
             
             switch (data.value) {
-                case 'intern':
-                    cardFilePath = 'internCard.json';
-                    topic = 'intern';
+                case 'leave':
+                    cardFilePath = 'leaveCard.json';
+                    topic = 'leave';
                     break;
-                case 'intern_eligibility':
-                    cardFilePath = 'internEligibilityCard.json';
-                    topic = 'intern eligibility';
-                    break;
-                case 'intern_stipend':
-                    cardFilePath = 'internStipendCard.json';
-                    topic = 'intern stipend';
-                    break;
-                case 'intern_duration':
-                    cardFilePath = 'internDurationCard.json';
-                    topic = 'intern duration';
-                    break;
+                
                 case 'wfh':
                     cardFilePath = 'wfhCard.json';
                     topic = 'work from home';
@@ -178,6 +172,9 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
                 case 'faqMenu':
                     cardFilePath = 'menu.json';
                     break;
+                case 'back_to_menu':
+                    await sendMenuCard(context);
+                    return;
                 default:
                     await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown option selected.' });
                     return;
@@ -212,21 +209,38 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
     }
 });
 
-app.message(/^(Hi|hi|hello|hello bot|polichat|good morning|good evening|menu)$/, async (context: TurnContext, state: ApplicationTurnState) => {
+
+
+
+app.message(/^(Hi|hi|hello|hello bot|polichat|good morning|good evening|hi bot Polichat|Hi Polichat|Hey Polichat|Yo Polichat|Polichat, you there?|Hi Polichat bot|What you got?|Show me)$/, async (context: TurnContext, state: ApplicationTurnState) => {
+    // const currentTime = new Date().getTime();
+    // const lastInteractionTime = state.conversation.lastInteractionTime || 0;
+    // const timeDifference = (currentTime - lastInteractionTime) / (1000 * 60); // time difference in minutes
+    // console.log("current time is: {currentTime}",currentTime);
+    // console.log("last interaction time is: {lastInteractionTime}",lastInteractionTime);
+    // console.log("time difference is: {timeDifference}",timeDifference);
+      await sendMenuCard(context);
+
+
+    // if (timeDifference > 1) { // 30 minutes threshold
+    //     await sendMenuCard(context);
+    // } else{
+    //     await context.sendActivity(`Hello! I am Polichat, the PSW Policy Bot. How can I assist you today with any queries related to PSW's HR policies?`);
+    // }
+
+    // state.conversation.lastInteractionTime = currentTime;
+});
+app.message(/^(menu|Menu|options)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     await sendMenuCard(context);
 });
 
-app.message(/^(reset|exit)$/, async (context: TurnContext, state: ApplicationTurnState) => {
+app.message(/^(reset|exit|thank you|thanks|bye|goodbye|that's all|Choices|Help)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     state.deleteConversationState;
     await context.sendActivity('Resetting conversation, let\'s start over');
     await sendMenuCard(context);
 });
 
-app.activity(ActivityTypes.EndOfConversation, async (context: TurnContext, state: ApplicationTurnState) => {
-    let count = state.conversation.count ?? 0;
-    state.conversation.count = ++count;
-    await context.sendActivity(`[${count}] you said: ${context.activity.text}`);
-});
+
 
 server.post('/api/messages', async (req, res) => {
     await adapter.process(req, res as any, async (context) => {

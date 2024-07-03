@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "@types/node": "^20.14.2"
+  },
+  "dependencies": {
+    "@pinecone-database/pinecone": "^2.2.2",
+    "openai": "^4.51.0",
+    "sentiment": "^5.0.2"
+  }
+}

@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.1.0",
     "manifestVersion": "1.15",
-    "id": "c2484053-71e1-4783-b231-d3ebb92430ee",
+    "id": "96d2bcc8-7fe1-4b77-8f44-df50df54892f",
     "packageName": "com.package.name",
     "name": {
         "short": "Polichat",
@@ -17,11 +17,11 @@
     },
     "description": {
         "short": "HR Query and Policy Bot",
-        "full": "Chatbot for querying HR directly about Updates and Policies"
+        "full": "Polichat HR Assistant is a chatbot designed to help PSW employees with HR-related queries and tasks. It offers a convenient FAQ menu and a context-aware AI for handling more complex questions, simplifying your HR interactions."
     },
     "icons": {
         "outline": "outline.png",
-        "color": "messages.png"
+        "color": "chatbot.gif"
     },
     "accentColor": "#FFFFFF",
     "staticTabs": [
@@ -36,11 +36,19 @@
             "scopes": [
                 "personal"
             ]
+        },
+        {
+            "entityId": "howToUse",
+            "name": "How to Use",
+            "contentUrl": "https://amaanhafeez18.github.io/howTo.html",
+            "scopes": [
+                "personal"
+            ]
         }
     ],
     "bots": [
         {
-            "botId": "62d3e09d-3433-4785-9960-d83e61522c67",
+            "botId": "3dabbcd0-1264-42f1-8ff0-f031666978b2",
             "scopes": [
                 "personal",
                 "team",

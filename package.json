@@ -24,6 +24,7 @@
         "@microsoft/teams-js": "^2.23.0",
         "@microsoft/teamsfx": "^2.3.2",
         "@pinecone-database/pinecone": "^2.2.2",
+        "async-lock": "^1.4.1",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
         "openai": "^4.28.4",
@@ -33,6 +34,7 @@
         "vectra": "^0.7.6"
     },
     "devDependencies": {
+        "@types/async-lock": "^1.4.2",
         "@types/jsonwebtoken": "^9.0.6",
         "@types/node": "^20.12.12",
         "@types/restify": "^8.5.12",
