@@ -7,7 +7,7 @@
         "items": [
           {
             "type": "TextBlock",
-            "text": "Welcome to Polichat! Click one of the policies below or type in your query. At any point, type in my name 'polichat' or 'hi' to return here! ",
+            "text": "Click one of the policies below or type in your query. At any point, type in my name, 'menu' or 'hi' to return here! ",
             "weight": "Bolder",
             "size": "Medium",
             "wrap": "true"
