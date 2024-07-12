@@ -99,10 +99,15 @@ planner.prompts.addDataSource(
 
 addResponseFormatter(app);
 
+
+
 const loadAdaptiveCard = (filePath: string) => {
-    const rawData = fs.readFileSync(filePath, 'utf-8');
+    const fullPath = path.join('src', 'adaptiveCards', filePath);
+    const rawData = fs.readFileSync(fullPath, 'utf-8');
     return JSON.parse(rawData);
 };
+
+
 
 
 async function sendMenuCard(context: TurnContext) {
@@ -113,12 +118,17 @@ async function sendMenuCard(context: TurnContext) {
 
 }
 
+const welcomeMessage = async (context: TurnContext) => {
+    const userName = context.activity.from.name ? context.activity.from.name.split(' ')[0] : 'there';
+    await context.sendActivity(`Hello ${userName}, how can I assist you today?`);
+    await sendMenuCard(context);
+};
+
 app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
     if (context.activity.membersAdded) {
         for (const member of context.activity.membersAdded) {
             if (member.id !== context.activity.recipient.id) {
-                await context.sendActivity('Welcome! How can I assist you today?');
-                await sendMenuCard(context);
+                await welcomeMessage(context);
             }
         }
     }
@@ -212,23 +222,28 @@ app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: Applicati
 
 
 
-app.message(/^(Hi|hi|hello|hello bot|polichat|good morning|good evening|hi bot Polichat|Hi Polichat|Hey Polichat|Yo Polichat|Polichat, you there?|Hi Polichat bot|What you got?|Show me)$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    // const currentTime = new Date().getTime();
-    // const lastInteractionTime = state.conversation.lastInteractionTime || 0;
-    // const timeDifference = (currentTime - lastInteractionTime) / (1000 * 60); // time difference in minutes
-    // console.log("current time is: {currentTime}",currentTime);
-    // console.log("last interaction time is: {lastInteractionTime}",lastInteractionTime);
-    // console.log("time difference is: {timeDifference}",timeDifference);
-      await sendMenuCard(context);
+app.message(/^(Hi|hi|HI|hello|hello bot|polichat|good morning|good evening|hi bot Polichat|Hi Polichat|Hey Polichat|Yo Polichat|Polichat, you there?|Hi Polichat bot|What you got?|Show me)$/, async (context: TurnContext, state: ApplicationTurnState) => {
+    const currentTime = new Date().getTime();
+    const lastInteractionTime = state.conversation.lastInteractionTime || 0;
+    const timeDifference = (currentTime - lastInteractionTime) / (1000 * 60); // time difference in minutes
+    console.log("current time is: {currentTime}",currentTime);
+    console.log("last interaction time is: {lastInteractionTime}",lastInteractionTime);
+    console.log("time difference is: {timeDifference}",timeDifference);
+   //  await sendMenuCard(context);
+   let userName = 'User'; // Default to 'User' if name is not available
+   if (context.activity.from && context.activity.from.name) {
+       userName = context.activity.from.name.split(' ')[0];
+   }
 
+   if (timeDifference > 30) { // 30 minutes threshold
+       await context.sendActivity(`Welcome ${userName}! How can I assist you today?`);
+       await sendMenuCard(context);
+   } else {
+       await context.sendActivity(`Hello ${userName}! I am Polichat, the PSW Policy Bot. How can I assist you today with any queries related to PSW's HR policies?`);
+   }
 
-    // if (timeDifference > 1) { // 30 minutes threshold
-    //     await sendMenuCard(context);
-    // } else{
-    //     await context.sendActivity(`Hello! I am Polichat, the PSW Policy Bot. How can I assist you today with any queries related to PSW's HR policies?`);
-    // }
-
-    // state.conversation.lastInteractionTime = currentTime;
+   state.conversation.lastInteractionTime = currentTime;
+   state.conversation.topic = '';
 });
 app.message(/^(menu|Menu|options)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     await sendMenuCard(context);
@@ -240,10 +255,12 @@ app.message(/^(reset|exit|thank you|thanks|bye|goodbye|that's all|Choices|Help)$
     await sendMenuCard(context);
 });
 
-
+const lock = new AsyncLock();
 
 server.post('/api/messages', async (req, res) => {
     await adapter.process(req, res as any, async (context) => {
-        await app.run(context);
+        await lock.acquire('userInput', async () => {
+            await app.run(context);
+        });
     });
 });

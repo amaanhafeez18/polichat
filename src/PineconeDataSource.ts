@@ -105,27 +105,29 @@ export class PineconeDataSource implements DataSource {
      * @param {number} maxTokens Maximum number of tokens allowed to be rendered.
      * @returns {Promise<RenderedPromptSection<string>>} A promise that resolves to the rendered data source.
      */
-    public async renderData(context: TurnContext,memory: Memory,tokenizer: Tokenizer,maxTokens: number
+    public async renderData(
+        context: TurnContext,
+        memory: Memory,
+        tokenizer: Tokenizer,
+        maxTokens: number
     ): Promise<RenderedPromptSection<string>> {
         // Query Pinecone index
-   const query = memory.getValue('temp.input') as string;
-   const topics = memory.getValue('conversation.topic') as string;
-
-
-    // Ensure the query is a string
-    if (typeof query !== 'string') {
-        throw new Error("Expected 'temp.input' to be a string");
-    }
-
-    const finalQuery = topics ? `${topics} - ${query} ` : query;
-    console.log("topic experimental :", topics);
-    console.log("Final Query:", finalQuery);
-
-    const embedding = await this._getEmbeddingForQuery(finalQuery);
-
+        const query = memory.getValue('temp.input') as string;
+        const topics = memory.getValue('conversation.topic') as string;
+    
+        // Ensure the query is a string
+        if (typeof query !== 'string') {
+            throw new Error("Expected 'temp.input' to be a string");
+        }
+    
+        const finalQuery = topics ? `${topics} - ${query} ` : query;
+        console.log("topic experimental :", topics);
+        console.log("Final Query:", finalQuery);
+    
+        const embedding = await this._getEmbeddingForQuery(finalQuery);
+    
         const results = await this._index.query({
             vector: embedding,
-            //this._options.maxDocuments ?? 5
             topK: 5,
             includeMetadata: true,
         });
@@ -134,23 +136,22 @@ export class PineconeDataSource implements DataSource {
         for (let i = 0; i < results.matches.length; i++) {
             const checking = results.matches[i].metadata;
     
-            if (checking) {
-                Object.values(checking).forEach(value => {
-                    // Typecast value to string
-                    const stringValue = value as string;
-                    chunks.push(stringValue.replace(/\r\n/g, '').replace(/\n/g, '').replace(/\+/g, ''));
-                });
+            if (checking && checking.chunkContent) {
+                const cleanedContent = checking.chunkContent
+                    .replace(/\r\n/g, '')
+                    .replace(/\n/g, '')
+                    .replace(/\+/g, '');
+    
+                chunks.push(cleanedContent);
             }
         }
     
         const concatenatedString = chunks.join('');
     
-        // console.log(concatenatedString);
-        let length = 0;
-
+        let length = 0; // You might want to calculate the actual length of tokens here
+    
         return { output: concatenatedString, length, tooLong: length > maxTokens };
     }
-
     private async _getEmbeddingForQuery(query: string): Promise<number[]> {
         // Function to get embeddings for the query
         const response = await openai.embeddings.create({

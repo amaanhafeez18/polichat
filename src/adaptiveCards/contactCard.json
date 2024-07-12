@@ -28,8 +28,8 @@
       },
       {
         "type": "Action.OpenUrl",
-        "title": "Click here to make a call: +92-339-21-6767-6",
-        "url": "tel:+923392167676"
+        "title": "Leave a message on whatsapp:",
+        "url": "https://Wa.me/+923392167676"
       },
       {
         "type": "Action.Execute",
