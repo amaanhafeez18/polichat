@@ -59,9 +59,9 @@ if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
 
 const model = new OpenAIModel({
     apiKey: process.env.OPENAI_KEY!,
-    defaultModel: 'gpt-3.5-turbo-0125',
+    defaultModel: 'gpt-4o-mini',
     azureApiKey: process.env.AZURE_OPENAI_KEY!,
-    azureDefaultDeployment: 'gpt-3.5-turbo',
+    azureDefaultDeployment: 'gpt-4o-mini',
     azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT!,
     azureApiVersion: '2023-03-15-preview',
     logRequests: true
