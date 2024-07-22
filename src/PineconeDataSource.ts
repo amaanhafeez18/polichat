@@ -128,7 +128,7 @@ export class PineconeDataSource implements DataSource {
     
         const results = await this._index.query({
             vector: embedding,
-            topK: 5,
+            topK: 9,
             includeMetadata: true,
         });
     
