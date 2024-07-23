@@ -24,6 +24,7 @@
         "@microsoft/teams-js": "^2.23.0",
         "@microsoft/teamsfx": "^2.3.2",
         "@pinecone-database/pinecone": "^2.2.2",
+        "@sinclair/typebox": "^0.32.35",
         "async-lock": "^1.4.1",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",

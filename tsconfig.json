@@ -10,6 +10,8 @@
         "strict": true,
         "target": "es2017",
         "tsBuildInfoFile": "./lib/.tsbuildinfo",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "maxNodeModuleJsDepth": 10,
+        "skipLibCheck": true
     }
 }

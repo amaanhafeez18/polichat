@@ -102,7 +102,8 @@ addResponseFormatter(app);
 
 
 const loadAdaptiveCard = (filePath: string) => {
-    const fullPath = path.join('src', 'adaptiveCards', filePath);
+    const fullPath = path.join(__dirname, '../src/adaptiveCards',filePath);
+    // const fullPath = path.join('src', 'adaptiveCards', filePath);
     const rawData = fs.readFileSync(fullPath, 'utf-8');
     return JSON.parse(rawData);
 };
