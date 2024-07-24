@@ -11,6 +11,10 @@ import AsyncLock from 'async-lock';
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
+if (!process.env.OPENAI_KEY || !process.env.PINECONE_KEY || !process.env.PINECONE_INDEX) {
+    throw new Error('Missing environment variables - please check that OPENAI_KEY, PINECONE_KEY or PINECONE_INDEX are set.');
+}
+
 const adapter = new TeamsAdapter(
     {},
     new ConfigurationServiceClientCredentialFactory({
@@ -46,16 +50,12 @@ server.listen(process.env.port || process.env.PORT || 3978, () => {
 interface ConversationState {
     messageId: string;
     count: number;
-    topic: string; // Added to track the current topic
     lastInteractionTime: number; // Added to store the last interaction time
     isProcessing: boolean; // Added to track if a message is being processed
 
 }
 type ApplicationTurnState = TurnState<ConversationState>;
 
-if (!process.env.OPENAI_KEY && !process.env.AZURE_OPENAI_KEY) {
-    throw new Error('Missing environment variables - please check that OPENAI_KEY or AZURE_OPENAI_KEY is set.');
-}
 
 const model = new OpenAIModel({
     apiKey: process.env.OPENAI_KEY!,
@@ -89,8 +89,8 @@ const app = new Application<ApplicationTurnState>({
 
 planner.prompts.addDataSource(
     new PineconeDataSource({
-        name: 'testindex',
-        apiKey: 'af190d88-9467-4c91-89a8-4124ab5f7e88',
+        name: process.env.PINECONE_INDEX!,
+        apiKey: process.env.PINECONE_KEY!,
         environment: '',
         maxDocuments: 5,
         maxTokensPerDocument: 600,
@@ -101,28 +101,10 @@ addResponseFormatter(app);
 
 
 
-const loadAdaptiveCard = (filePath: string) => {
-    const fullPath = path.join(__dirname, '../src/adaptiveCards',filePath);
-    // const fullPath = path.join('src', 'adaptiveCards', filePath);
-    const rawData = fs.readFileSync(fullPath, 'utf-8');
-    return JSON.parse(rawData);
-};
-
-
-
-
-async function sendMenuCard(context: TurnContext) {
-    const card = loadAdaptiveCard("menu.json");
-    const cardAttachment = CardFactory.adaptiveCard(card);
-    const message = MessageFactory.attachment(cardAttachment);
-    await context.sendActivity(message);
-
-}
 
 const welcomeMessage = async (context: TurnContext) => {
     const userName = context.activity.from.name ? context.activity.from.name.split(' ')[0] : 'there';
-    await context.sendActivity(`Hello ${userName}, how can I assist you today?`);
-    await sendMenuCard(context);
+    await context.sendActivity(`Hello ${userName}! I am Polichat, the PSW Policy Bot. How can I assist you?`);
 };
 
 app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, state: ApplicationTurnState) => {
@@ -149,80 +131,6 @@ app.ai.action(AI.FlaggedOutputActionName, async (context: TurnContext, state: Ap
 });
 
 
-app.activity(ActivityTypes.Invoke, async (context: TurnContext, state: ApplicationTurnState) => {
-    if (context.activity.type === ActivityTypes.Invoke && context.activity.value) {
-        const invokeValue = context.activity.value as AdaptiveCardInvokeValue;
-
-        if (invokeValue.action && invokeValue.action.type === 'Action.Execute') {
-            const data = invokeValue.action.data;
-            let cardFilePath: string;
-            let topic: string | undefined; // Added to track the topic
-            
-            switch (data.value) {
-                case 'leave':
-                    cardFilePath = 'leaveCard.json';
-                    topic = 'leave';
-                    break;
-                
-                case 'wfh':
-                    cardFilePath = 'wfhCard.json';
-                    topic = 'work from home';
-                    break;
-                case 'fuel':
-                    cardFilePath = 'fuelCard.json';
-                    topic = 'fuel';
-                    break;
-                case 'contact':
-                    cardFilePath = 'contactCard.json';
-                    topic = 'contact';
-                    break;
-                case 'healthcare':
-                    cardFilePath = 'healthcare.json';
-                    topic = 'healthcare';
-                    break;
-                case 'faqMenu':
-                    cardFilePath = 'menu.json';
-                    break;
-                case 'back_to_menu':
-                    await sendMenuCard(context);
-                    return;
-                default:
-                    await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown option selected.' });
-                    return;
-            }
-            if (topic) {
-                state.conversation.topic = topic; // Store the topic in the conversation state
-                context.turnState.set('conversation.topic', topic);
-
-            }
-            console.log("topic index.ts :", topic);
-
-            const card = await loadAdaptiveCard(cardFilePath);
-
-
-            const response: InvokeResponse<AdaptiveCardInvokeResponse> = {
-                status: 200,
-                body: {
-                    statusCode: 200,
-                    type: 'application/vnd.microsoft.card.adaptive',
-                    value: card // This assumes card is a parsed JSON object
-                }
-            };
-
-            await context.sendActivity({ type: ActivityTypes.InvokeResponse, value: response });
-            return;
-  
-        } else {
-            await context.sendActivity({ type: ActivityTypes.Message, text: 'Unknown or unsupported invoke action.' });
-        }
-    } else {
-        await context.sendActivity({ type: ActivityTypes.Message, text: 'Please select an option from the menu.' });
-    }
-});
-
-
-
-
 app.message(/^(Hi|hi|HI|hello|hello bot|polichat|good morning|good evening|hi bot Polichat|Hi Polichat|Hey Polichat|Yo Polichat|Polichat, you there?|Hi Polichat bot|What you got?|Show me)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     const currentTime = new Date().getTime();
     const lastInteractionTime = state.conversation.lastInteractionTime || 0;
@@ -237,23 +145,19 @@ app.message(/^(Hi|hi|HI|hello|hello bot|polichat|good morning|good evening|hi bo
    }
 
    if (timeDifference > 30) { // 30 minutes threshold
-       await context.sendActivity(`Welcome ${userName}! How can I assist you today?`);
-       await sendMenuCard(context);
+       await context.sendActivity(`Welcome back ${userName}! How can I assist you today?`);
    } else {
-       await context.sendActivity(`Hello ${userName}! I am Polichat, the PSW Policy Bot. How can I assist you today with any queries related to PSW's HR policies?`);
+       await context.sendActivity(`Hello ${userName}, how can I assist you today?`);
+
    }
 
    state.conversation.lastInteractionTime = currentTime;
-   state.conversation.topic = '';
 });
-app.message(/^(menu|Menu|options)$/, async (context: TurnContext, state: ApplicationTurnState) => {
-    await sendMenuCard(context);
-});
+
 
 app.message(/^(reset|exit|thank you|thanks|bye|goodbye|that's all|Choices|Help)$/, async (context: TurnContext, state: ApplicationTurnState) => {
     state.deleteConversationState;
-    await context.sendActivity('Resetting conversation, let\'s start over');
-    await sendMenuCard(context);
+    await context.sendActivity('Resetting conversation, I hope to see you soon!');
 });
 
 const lock = new AsyncLock();

@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.1.0",
     "manifestVersion": "1.15",
-    "id": "96d2bcc8-7fe1-4b77-8f44-df50df54892f",
+    "id": "17a65535-e78c-409b-8af2-e078974f6690",
     "packageName": "com.package.name",
     "name": {
         "short": "Polichat",
@@ -40,7 +40,7 @@
     ],
     "bots": [
         {
-            "botId": "eb0e7b30-9bc9-4d27-8f8d-3539634edbdc",
+            "botId": "967e0e3d-9f1e-42fa-b6ac-a98f36a2bcd0",
             "scopes": [
                 "personal",
                 "team",

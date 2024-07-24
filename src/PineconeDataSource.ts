@@ -7,10 +7,13 @@ import path from 'path';
 import { config } from 'dotenv';
 const pc = require('openai');
 require('dotenv').config();
+
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
+
+
 const openai = new OpenAI({
-  apiKey: "sk-proj-Mgi7HS0CAZWapFWDhs3fT3BlbkFJNTTWz1VdjT328tLqyF3s",
+  apiKey: process.env.OPENAI_KEY,
 });
 
 /**
@@ -113,18 +116,14 @@ export class PineconeDataSource implements DataSource {
     ): Promise<RenderedPromptSection<string>> {
         // Query Pinecone index
         const query = memory.getValue('temp.input') as string;
-        const topics = memory.getValue('conversation.topic') as string;
     
         // Ensure the query is a string
         if (typeof query !== 'string') {
             throw new Error("Expected 'temp.input' to be a string");
         }
     
-        const finalQuery = topics ? `${topics} - ${query} ` : query;
-        console.log("topic experimental :", topics);
-        console.log("Final Query:", finalQuery);
     
-        const embedding = await this._getEmbeddingForQuery(finalQuery);
+        const embedding = await this._getEmbeddingForQuery(query);
     
         const results = await this._index.query({
             vector: embedding,
