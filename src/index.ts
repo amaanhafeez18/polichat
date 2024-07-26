@@ -7,6 +7,7 @@ import {AI,Application,ActionPlanner,OpenAIModel,PromptManager,TurnState,TeamsAd
 import { addResponseFormatter } from './responseFormatter';
 import { PineconeDataSource } from './PineconeDataSource'; 
 import AsyncLock from 'async-lock';
+import { ChromaDataSource } from './ChromaDataSource';
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
@@ -88,13 +89,21 @@ const app = new Application<ApplicationTurnState>({
 });
 
 planner.prompts.addDataSource(
-    new PineconeDataSource({
-        name: process.env.PINECONE_INDEX!,
-        apiKey: process.env.PINECONE_KEY!,
-        environment: '',
+
+
+    new ChromaDataSource({
+        name: process.env.CHROMA_INDEX_NAME!,
         maxDocuments: 5,
         maxTokensPerDocument: 600,
     })
+
+    // new PineconeDataSource({
+    //     name: process.env.PINECONE_INDEX!,
+    //     apiKey: process.env.PINECONE_KEY!,
+    //     environment: '',
+    //     maxDocuments: 5,
+    //     maxTokensPerDocument: 600,
+    // })
 );
 
 addResponseFormatter(app);

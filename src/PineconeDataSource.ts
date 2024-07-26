@@ -5,7 +5,6 @@ import { Pinecone } from '@pinecone-database/pinecone';
 import {OpenAI} from 'openai'
 import path from 'path';
 import { config } from 'dotenv';
-const pc = require('openai');
 require('dotenv').config();
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
