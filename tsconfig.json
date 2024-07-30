@@ -4,14 +4,15 @@
         "forceConsistentCasingInFileNames": true,
         "incremental": true,
         "module": "commonjs",
+        "target":"ES6",
         "outDir": "./lib",
         "rootDir": "./src",
         "sourceMap": true,
         "strict": true,
-        "target": "es2017",
         "tsBuildInfoFile": "./lib/.tsbuildinfo",
         "esModuleInterop": true,
         "maxNodeModuleJsDepth": 10,
         "skipLibCheck": true
     }
+    
 }

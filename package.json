@@ -6,6 +6,7 @@
     "license": "MIT",
     "main": "./lib/index.js",
     "scripts": {
+         "docs": "typedoc",
         "dev:teamsfx": "npm run dev",
         "dev": "nodemon --watch ./src --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build",
@@ -28,6 +29,8 @@
         "async-lock": "^1.4.1",
         "botbuilder": "^4.22.2",
         "dotenv": "^16.4.5",
+        "esdoc-standard-plugin": "^1.0.0",
+        "jsdoc-tsimport-plugin": "^1.0.5",
         "openai": "^4.28.4",
         "pinecone": "^0.1.0",
         "replace": "~1.2.0",
@@ -35,17 +38,23 @@
         "vectra": "^0.7.6"
     },
     "devDependencies": {
+        "@compodoc/compodoc": "^1.1.25",
         "@types/async-lock": "^1.4.2",
         "@types/jsonwebtoken": "^9.0.6",
-        "@types/node": "^20.12.12",
+        "@types/node": "^20.14.13",
         "@types/restify": "^8.5.12",
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
+        "better-docs": "^2.7.3",
         "eslint": "^8.57.0",
+        "jsdoc": "^4.0.3",
+        "jsdoc-ts-utils": "^5.0.0",
         "nodemon": "~3.0.1",
         "prettier": "^3.2.5",
         "rimraf": "^5.0.7",
         "ts-node": "^10.9.2",
-        "typescript": "^5.4.5"
+        "typedoc": "^0.26.5",
+        "typedoc-plugin-markdown": "^4.2.3",
+        "typescript": "^5.5.4"
     }
 }

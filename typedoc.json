@@ -1,0 +1,10 @@
+{
+  "entryPoints": ["src/index.ts","src/PineconeData.ts","src/responseFormatter.ts"],
+  "out": "./docs",
+  "exclude": ["**/node_modules/**"],
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeNotDocumented": false,
+  "hideGenerator": true,
+  "theme": "default"
+}
