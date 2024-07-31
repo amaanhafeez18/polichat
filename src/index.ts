@@ -6,6 +6,7 @@ import { AI, Application, ActionPlanner, OpenAIModel, PromptManager, TurnState, 
 import { addResponseFormatter } from './responseFormatter';
 import { PineconeDataSource } from './PineconeData';
 import AsyncLock from 'async-lock';
+import { Next } from 'restify';
 
 // Load environment variables from a .env file into process.env
 const ENV_FILE = path.join(__dirname, '..', '.env');
@@ -259,10 +260,11 @@ const lock = new AsyncLock();
  * 
  * @returns {Promise<void>} A promise that resolves when the message processing is complete.
  */
-server.post('/api/messages', async (req, res) => {
+server.post('/api/messages', async (req, res, next: Next) => {
     await adapter.process(req, res as any, async (context) => {
         await lock.acquire('userInput', async () => {
             await app.run(context);
         });
     });
+    next();
 });
