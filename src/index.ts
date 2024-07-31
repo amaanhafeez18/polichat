@@ -219,7 +219,7 @@ app.message(/^(Hi|hi|HI|hello|hello bot|polichat|good morning|good evening|hi bo
     const currentTime = new Date().getTime();
     const lastInteractionTime = state.conversation.lastInteractionTime || 0;
     const timeDifference = (currentTime - lastInteractionTime) / (1000 * 60); // Time difference in minutes
-    
+
     let userName = 'User'; // Default to 'User' if name is not available
     if (context.activity.from && context.activity.from.name) {
         userName = context.activity.from.name.split(' ')[0];
@@ -267,4 +267,8 @@ server.post('/api/messages', async (req, res, next: Next) => {
         });
     });
     next();
+});
+
+server.get('/api/get', (req, res, next: Next) => {
+    res.send('This is the test get response');
 });
