@@ -1,17 +1,16 @@
 import { config } from 'dotenv';
 import * as path from 'path';
 import * as restify from 'restify';
-import {  MessageFactory, CardFactory, AdaptiveCardInvokeValue, AdaptiveCardInvokeResponse, InvokeResponse, ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext  } from 'botbuilder';
-import * as fs from 'fs';
+import { ActivityTypes, ConfigurationServiceClientCredentialFactory, MemoryStorage, TurnContext  } from 'botbuilder';
 import {AI,Application,ActionPlanner,OpenAIModel,PromptManager,TurnState,TeamsAdapter} from '@microsoft/teams-ai';
 import { addResponseFormatter } from './responseFormatter';
-import { PineconeDataSource } from './PineconeDataSource'; 
+import { WeaviateDataSource } from './WeaviateDataSource'; 
 import AsyncLock from 'async-lock';
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 config({ path: ENV_FILE });
 
-if (!process.env.OPENAI_KEY || !process.env.PINECONE_KEY || !process.env.PINECONE_INDEX) {
+if (!process.env.OPENAI_KEY) {
     throw new Error('Missing environment variables - please check that OPENAI_KEY, PINECONE_KEY or PINECONE_INDEX are set.');
 }
 
@@ -88,18 +87,15 @@ const app = new Application<ApplicationTurnState>({
 });
 
 planner.prompts.addDataSource(
-    new PineconeDataSource({
-        name: process.env.PINECONE_INDEX!,
-        apiKey: process.env.PINECONE_KEY!,
-        environment: '',
+    new WeaviateDataSource({
+        className:"TextChunk",
+        url: process.env.WEAVIATE_URL!,
         maxDocuments: 5,
         maxTokensPerDocument: 600,
-    })
+    },  )
 );
 
 addResponseFormatter(app);
-
-
 
 
 const welcomeMessage = async (context: TurnContext) => {
@@ -112,7 +108,7 @@ app.activity(ActivityTypes.ConversationUpdate, async (context: TurnContext, stat
         for (const member of context.activity.membersAdded) {
             if (member.id !== context.activity.recipient.id) {
                 await welcomeMessage(context);
-            }
+            }1
         }
     }
 });

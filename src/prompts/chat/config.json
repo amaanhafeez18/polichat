@@ -15,10 +15,7 @@
         "frequency_penalty": 0.4,
         "stop_sequences": []
         },
-    "augmentation": {
-        "augmentation_type": "none",
         "data_sources": {
-            "testindex": 1200
+            "TextChunk": 1200
         }
-    }
   }
