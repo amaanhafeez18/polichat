@@ -2,7 +2,7 @@
     "$schema": "https://developer.microsoft.com/json-schemas/teams/v1.15/MicrosoftTeams.schema.json",
     "version": "1.1.0",
     "manifestVersion": "1.15",
-    "id": "17a65535-e78c-409b-8af2-e078974f6690",
+    "id": "96d2bcc8-7fe1-4b77-8f44-df50df54892f",
     "packageName": "com.package.name",
     "name": {
         "short": "Polichat",
@@ -17,7 +17,7 @@
     },
     "description": {
         "short": "HR Query and Policy Bot",
-        "full": "Polichat HR Assistant is a chatbot designed to help PSW employees with HR-related queries and tasks. It offers a convenient FAQ menu and a context-aware AI for handling more complex questions, simplifying your HR interactions.\n\n\n\n To use Polichat HR Assistant, start by opening the chat and saying 'Hi' or asking a specific HR-related question. \n\n\n\nIf you need to reset the conversation or start over, simply type 'reset'. The assistant will clear the current context and begin a new session.\n\n\n\n To return to the main menu at any point, type 'menu'. "
+        "full": "Polichat HR Assistant is a chatbot designed to help PSW employees with HR-related queries and tasks. \n\n\n\n To use Polichat HR Assistant, start by opening the chat and saying 'Hi' or asking a specific HR-related question. \n\n\n\nIf you need to reset the conversation or start over, simply type 'reset'. The assistant will clear the current context and begin a new session. "
     },
     "icons": {
         "outline": "outline.png",
@@ -40,7 +40,7 @@
     ],
     "bots": [
         {
-            "botId": "967e0e3d-9f1e-42fa-b6ac-a98f36a2bcd0",
+            "botId": "3dabbcd0-1264-42f1-8ff0-f031666978b2",
             "scopes": [
                 "personal",
                 "team",

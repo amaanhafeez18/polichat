@@ -16,6 +16,8 @@ if (!process.env.OPENAI_KEY || !process.env.PINECONE_KEY || !process.env.PINECON
     throw new Error('Missing environment variables - please check that OPENAI_KEY, PINECONE_KEY, or PINECONE_INDEX are set.');
 }
 
+
+
 // Initialize TeamsAdapter with credentials for Microsoft Bot Framework
 const adapter = new TeamsAdapter(
     {},

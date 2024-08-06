@@ -18,7 +18,7 @@
     },
     "description": {
         "short": "HR Query and Policy Bot",
-        "full": "Polichat HR Assistant is a chatbot designed to help PSW employees with HR-related queries and tasks. It offers a convenient FAQ menu and a context-aware AI for handling more complex questions, simplifying your HR interactions.\n\n\n\n To use Polichat HR Assistant, start by opening the chat and saying 'Hi' or asking a specific HR-related question. \n\n\n\nIf you need to reset the conversation or start over, simply type 'reset'. The assistant will clear the current context and begin a new session.\n\n\n\n To return to the main menu at any point, type 'menu'. "
+        "full": "Polichat HR Assistant is a chatbot designed to help PSW employees with HR-related queries and tasks. \n\n\n\n To use Polichat HR Assistant, start by opening the chat and saying 'Hi' or asking a specific HR-related question. \n\n\n\nIf you need to reset the conversation or start over, simply type 'reset'. The assistant will clear the current context and begin a new session. "
     },
     "icons": {
         "outline": "outline.png",
